@@ -662,27 +662,51 @@ function confirmPrefs() {
 const RECIPIENT_EMAIL = 'eternitysnow0210@gmail.com';
 const INVITER_NAME = 'М. Пүрэвдорж';
 
-function sendResult() {
+async function sendResult() {
   const name = INVITER_NAME;
 
   const foodStr = selectedFood || 'юу таарна тэрийг';
-  const actStr = selectedActivities.size ? [...selectedActivities].join(', ') : 'юу тохиолдоно тэрийг';
+  const actStr = selectedActivities.size
+    ? [...selectedActivities].join(', ')
+    : 'юу тохиолдоно тэрийг';
 
-  const subject = `${name}-с болзооны хариу ирлээ 💌`;
-  const body =
-`Хэн: ${name}\n` +
-`Хэзээ: ${savedDateStr}${savedTimeStr}\n` +
-`Хоол: ${foodStr}\n` +
-`Хийх зүйл: ${actStr}\n\n` +
-`— автоматаар илгээгдсэн 💕`;
+  const formData = new FormData();
 
-  const mailtoLink = `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoLink;
+  formData.append('subject', `${name}-с болзооны хариу ирлээ 💌`);
+  formData.append('Хэн', name);
+  formData.append('Хэзээ', `${savedDateStr}${savedTimeStr}`);
+  formData.append('Хоол', foodStr);
+  formData.append('Хийх зүйл', actStr);
 
+  const sendBtn = document.getElementById('sendBtn');
   const note = document.getElementById('sentNote');
-  note.textContent = 'Имэйл клиент чинь нээгдсэн байх ёстой — доторх мэдээллийг шалгаад илгээгээрэй.';
-  note.classList.add('show');
-  document.getElementById('sendBtn').textContent = 'Дахин илгээх';
+
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Илгээж байна... 💌';
+
+  try {
+    const response = await fetch('https://formspree.io/f/xeajplwa', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      note.textContent = 'Хариу амжилттай илгээгдлээ! 💕';
+      note.classList.add('show');
+      sendBtn.textContent = 'Амжилттай илгээгдлээ ❤️';
+    } else {
+      throw new Error('Submission failed');
+    }
+
+  } catch (error) {
+    note.textContent = 'Илгээхэд алдаа гарлаа. Дахин оролдоно уу.';
+    note.classList.add('show');
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Дахин илгээх 📩';
+  }
 }
 
 function spawnHearts(count = 8) {
