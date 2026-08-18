@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хамт цугларах уу? 💕</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+
+  h1 {
+    font-size: 26px;
+    color: #d63384;
+    margin: 0 0 8px;
+  }
+
+  .heart {
+    font-size: 48px;
+    animation: beat 1.2s infinite;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.15); }
+    50% { transform: scale(1); }
+  }
+
+  p.subtitle {
+    color: #888;
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  .btn-row {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    min-height: 60px;
+  }
+
+  button {
+    border: none;
+    border-radius: 50px;
+    padding: 14px 32px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  #yesBtn {
+    background: #ff4d6d;
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+    font-size: calc(17px + var(--grow, 0) * 1.6px);
+    padding: calc(14px + var(--grow, 0) * 1.4px) calc(32px + var(--grow, 0) * 2.6px);
+  }
+
+  #yesBtn:hover {
+    transform: scale(1.05);
+  }
+
+  #noBtn {
+    background: #f1f1f1;
+    color: #555;
+    position: relative;
+    transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                top 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.2s ease;
+  }
+
+  #noBtn.escaping {
+    position: fixed;
+  }
+
+  .result {
+    display: none;
+    margin-top: 28px;
+    text-align: left;
+  }
+
+  .result.show {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .result input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #ffb3c1;
+    font-size: 15px;
+    margin-bottom: 16px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .result input:focus {
+    border-color: #ff4d6d;
+  }
+
+  #confirmBtn {
+    width: 100%;
+    background: #d63384;
+    color: white;
+    padding: 13px;
+    font-size: 16px;
+  }
+
+  #confirmBtn:hover {
+    transform: scale(1.02);
+  }
+
+  .confirmed {
+    display: none;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .confirmed.show {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .confirmed .big {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+
+  .final-art {
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto 12px;
+    animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .final-art svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .confirmed p {
+    color: #d63384;
+    font-weight: 600;
+    font-size: 17px;
+    margin: 0;
+  }
+
+  .no-caption {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 12px;
+    min-height: 18px;
+  }
+
+  .prefs {
+    display: none;
+    margin-top: 28px;
+    text-align: left;
+  }
+
+  .prefs.show {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .prefs label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .time-chip {
+    border: 1.5px solid #ffb3c1;
+    background: white;
+    color: #d63384;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex: 1 1 auto;
+    min-width: 72px;
+    text-align: center;
+  }
+
+  .time-chip:hover {
+    background: #fff0f3;
+  }
+
+  .time-chip.selected {
+    background: #ff4d6d;
+    color: white;
+    border-color: #ff4d6d;
+    box-shadow: 0 6px 14px rgba(255, 77, 109, 0.35);
+    transform: scale(1.05);
+  }
+
+  .chip {
+    border: 1.5px solid #ffb3c1;
+    background: white;
+    color: #d63384;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .chip:hover {
+    background: #fff0f3;
+  }
+
+  .chip.selected {
+    background: #ff4d6d;
+    color: white;
+    border-color: #ff4d6d;
+    transform: scale(1.05);
+  }
+
+  #prefsBtn {
+    width: 100%;
+    background: #d63384;
+    color: white;
+    padding: 13px;
+    font-size: 16px;
+  }
+
+  #prefsBtn:hover {
+    transform: scale(1.02);
+  }
+
+  .prefs-summary {
+    color: #888 !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    margin-top: 8px !important;
+  }
+
+  .error-text {
+    color: #ff4d6d;
+    font-size: 13px;
+    margin: -12px 0 12px;
+    display: none;
+  }
+
+  .error-text.show {
+    display: block;
+  }
+
+  .send-label {
+    display: block;
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+    margin: 20px 0 8px;
+  }
+
+  #nameInput {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #ffb3c1;
+    font-size: 15px;
+    margin-bottom: 12px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  #nameInput:focus {
+    border-color: #ff4d6d;
+  }
+
+  #sendBtn {
+    width: 100%;
+    background: #ff4d6d;
+    color: white;
+    padding: 13px;
+    font-size: 16px;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.35);
+  }
+
+  #sendBtn:hover {
+    transform: scale(1.02);
+  }
+
+  .sent-note {
+    font-size: 13px;
+    color: #888 !important;
+    font-weight: 400 !important;
+    margin-top: 12px !important;
+    display: none;
+  }
+
+  .sent-note.show {
+    display: block;
+  }
+
+  .hearts-bg span {
+    position: fixed;
+    bottom: -40px;
+    font-size: 20px;
+    opacity: 0.7;
+    animation: float 6s linear forwards;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    to {
+      transform: translateY(-110vh) rotate(20deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <div class="heart">💗</div>
+  <h1>Надтай хамт болзоонд явах уу?</h1>
+  <p class="subtitle">Чамайг зөвшөөрнө гэж найдаж байна...🫶🏻</p>
+
+  <div class="btn-row" id="btnRow">
+    <button id="yesBtn" onclick="sayYes()">Тийм ❤️</button>
+    <button id="noBtn" onmouseover="runAway()" ontouchstart="runAway(event)" onclick="runAway()">Үгүй</button>
+  </div>
+  <div class="no-caption" id="noCaption"></div>
+
+  <div class="result" id="resultBox">
+    <label for="dateInput">Хэзээ болзоогоо товлох вэ?</label>
+    <input type="date" id="dateInput">
+
+    <label>Хэдэн цагт тохиромжтой вэ?</label>
+    <div class="chip-group" id="timeChips"></div>
+    <p class="error-text" id="timeError">Цагаа сонгоно уу 🙂</p>
+
+    <button id="confirmBtn" onclick="confirmDate()">Сонгох! 🎉</button>
+  </div>
+
+  <div class="prefs" id="prefsBox">
+    <div id="foodStep">
+      <label>Ямар хоол идмээр байна вэ?</label>
+      <div class="chip-group" id="foodChips"></div>
+    </div>
+
+    <div id="activityStep" style="display:none;">
+      <label>Хамтдаа юу хийхийг хүсэж байна?</label>
+      <div class="chip-group" id="activityChips"></div>
+      <button id="prefsBtn" onclick="confirmPrefs()">Тэгвэл шийдлээ! 💖</button>
+    </div>
+  </div>
+
+  <div class="confirmed" id="confirmedBox">
+    <div class="final-art">
+      <svg viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffe3ea"/>
+            <stop offset="100%" stop-color="#ffc2d1"/>
+          </linearGradient>
+          <linearGradient id="heartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ff8fa3"/>
+            <stop offset="100%" stop-color="#ff4d6d"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="130" cy="185" rx="110" ry="12" fill="#ffb6c9" opacity="0.5"/>
+
+        <g>
+          <ellipse cx="45" cy="45" rx="18" ry="22" fill="#ff8fa3"/>
+          <path d="M45 67 Q40 85 45 100" stroke="#ff8fa3" stroke-width="2" fill="none"/>
+          <path d="M42 100 l3 6 l3 -6 Z" fill="#ff8fa3"/>
+        </g>
+        <g>
+          <ellipse cx="215" cy="38" rx="16" ry="20" fill="#ffb3c1"/>
+          <path d="M215 58 Q211 76 215 90" stroke="#ffb3c1" stroke-width="2" fill="none"/>
+          <path d="M212 90 l3 6 l3 -6 Z" fill="#ffb3c1"/>
+        </g>
+
+        <circle cx="130" cy="98" r="72" fill="#ff6b81" opacity="0.12"/>
+
+        <path d="M130 148
+                 C 104 122, 68 98, 68 68
+                 C 68 42, 92 28, 130 54
+                 C 168 28, 192 42, 192 68
+                 C 192 98, 156 122, 130 148 Z"
+              fill="url(#heartGrad)"/>
+        <path d="M130 148
+                 C 104 122, 68 98, 68 68
+                 C 68 42, 92 28, 130 54
+                 C 168 28, 192 42, 192 68
+                 C 192 98, 156 122, 130 148 Z"
+              fill="none" stroke="#ffffff" stroke-width="1" opacity="0.35"/>
+        <path d="M92 60 C 88 50, 98 42, 112 47" stroke="#ffffff" stroke-width="4" fill="none"
+              stroke-linecap="round" opacity="0.45"/>
+
+        <path d="M72 128 c-2.5 -4 -9 -4 -9 1.5 c0 5 9 9.5 9 9.5 s9 -4.5 9 -9.5 c0 -5.5 -6.5 -5.5 -9 -1.5 Z" fill="#ff8fa3" opacity="0.9"/>
+        <path d="M196 118 c-2 -3.3 -7.5 -3.3 -7.5 1.2 c0 4.2 7.5 8 7.5 8 s7.5 -3.8 7.5 -8 c0 -4.5 -5.5 -4.5 -7.5 -1.2 Z" fill="#ffb3c1"/>
+        <path d="M130 172 c-2 -3.3 -7.5 -3.3 -7.5 1.2 c0 4.2 7.5 8 7.5 8 s7.5 -3.8 7.5 -8 c0 -4.5 -5.5 -4.5 -7.5 -1.2 Z" fill="#ff4d6d" opacity="0.85"/>
+
+        <g>
+          <path d="M130 158 C 112 150, 96 154, 98 166 C 100 176, 118 174, 130 162 Z" fill="#ffffff" stroke="#ff4d6d" stroke-width="1.5"/>
+          <path d="M130 158 C 148 150, 164 154, 162 166 C 160 176, 142 174, 130 162 Z" fill="#ffffff" stroke="#ff4d6d" stroke-width="1.5"/>
+          <path d="M126 168 l4 -8 l4 8 l-4 6 Z" fill="#ffffff" opacity="0.9"/>
+          <path d="M126 168 l4 4 l4 -4 l-4 14 Z" fill="#ff4d6d" opacity="0.7"/>
+          <circle cx="130" cy="163" r="5" fill="#d63384"/>
+        </g>
+
+        <g fill="#ff8fa3">
+          <path d="M60 60 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 Z"/>
+          <path d="M205 130 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5 Z"/>
+          <path d="M40 150 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5 Z"/>
+          <path d="M130 20 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 Z"/>
+          <path d="M225 80 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5 Z"/>
+          <path d="M28 95 l1.5 3.5 l3.5 1.5 l-3.5 1.5 l-1.5 3.5 l-1.5 -3.5 l-3.5 -1.5 l3.5 -1.5 Z"/>
+          <path d="M170 25 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z" fill="#ffd166"/>
+          <path d="M90 175 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z" fill="#ffd166"/>
+        </g>
+      </svg>
+    </div>
+    <p id="confirmedText"></p>
+    <p id="prefsText" class="prefs-summary"></p>
+    <p class="send-label" style="text-align:center; color:#d63384; font-size:16px; margin-top:20px;">Хүндэтгэн урьсан М. Пүрэвдорж</p>
+    <button id="sendBtn" onclick="sendResult()">Илгээх 📩</button>
+    <p class="sent-note" id="sentNote"></p>
+  </div>
+</div>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<script>
+const noBtn = document.getElementById('noBtn');
+const noCaption = document.getElementById('noCaption');
+const card = document.getElementById('card');
+
+const captions = [
+  "Хөөе, битгий л дээ 🥺",
+  "Арай үгүй гэж хэлэх гэж байгаа юм биш биз дээ🥺...",
+  "Үгүй дээр битгий дар л даа?🥺 ",
+  "Намайг барьж чадахгүй дээ кк🤣",
+  "Дахиад оролдоод үзээрэй🥰",
+  "Энэ товч чамд баригдахгүй дээ кк 🥰",
+  "Тийм товч руу дарчихаа 🙏",
+];
+let clickCount = 0;
+
+function runAway(e) {
+  if (e) e.preventDefault();
+  clickCount++;
+
+  const btnRect = noBtn.getBoundingClientRect();
+  const btnW = btnRect.width;
+  const btnH = btnRect.height;
+
+  if (!noBtn.classList.contains('escaping')) {
+    noBtn.style.left = btnRect.left + 'px';
+    noBtn.style.top = btnRect.top + 'px';
+    noBtn.classList.add('escaping');
+    noBtn.offsetHeight;
+  }
+
+  const margin = 20;
+  const maxX = window.innerWidth - btnW - margin;
+  const maxY = window.innerHeight - btnH - margin;
+
+  const newX = Math.max(margin, Math.random() * maxX);
+  const newY = Math.max(margin, Math.random() * maxY);
+
+  noBtn.style.left = newX + 'px';
+  noBtn.style.top = newY + 'px';
+
+  noCaption.textContent = captions[Math.min(clickCount - 1, captions.length - 1)];
+
+  const yesBtn = document.getElementById('yesBtn');
+  const grow = Math.min(clickCount, 8);
+  yesBtn.style.setProperty('--grow', grow);
+}
+
+function sayYes() {
+  document.getElementById('btnRow').style.display = 'none';
+  noCaption.style.display = 'none';
+  document.querySelector('.subtitle').textContent = 'Баярлалаа! 🥰 Одоо огноогоо сонгоцгооё';
+  document.getElementById('resultBox').classList.add('show');
+  spawnHearts();
+}
+
+const timeSlots = [
+  { label: '10:00 🌅', value: '10:00' },
+  { label: '12:00 ☀️', value: '12:00' },
+  { label: '14:00 ☀️', value: '14:00' },
+  { label: '16:00 🌇', value: '16:00' },
+  { label: '18:00 🌆', value: '18:00' },
+  { label: '20:00 🌙', value: '20:00' },
+];
+
+let selectedTime = '';
+
+function buildTimeChips() {
+  const el = document.getElementById('timeChips');
+  timeSlots.forEach(slot => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'time-chip';
+    chip.textContent = slot.label;
+    chip.onclick = () => {
+      document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedTime = slot.value;
+      document.getElementById('timeError').classList.remove('show');
+    };
+    el.appendChild(chip);
+  });
+}
+
+buildTimeChips();
+
+const foodOptions = ['🍕 Пицца','🍣 Суши','🍔 Бургер','🍲 Солонгос хоол','☕ Coffee shop','🥗 Хөнгөн хоол/Salad'];
+const activityOptions = ['Кино үзэх','Гадуур хамтдаа алхах','Тоглоом тоглох','Дэлгүүр хэсэх','Ном/Кафед суух','Уран бүтээл (гар урлал)'];
+
+let selectedFood = '';
+let selectedActivities = new Set();
+
+function buildFoodChips() {
+  const el = document.getElementById('foodChips');
+  foodOptions.forEach(opt => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'time-chip';
+    chip.textContent = opt;
+    chip.onclick = () => {
+      document.querySelectorAll('#foodChips .time-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selectedFood = opt;
+      setTimeout(() => {
+        document.getElementById('foodStep').style.display = 'none';
+        document.getElementById('activityStep').style.display = 'block';
+      }, 350);
+    };
+    el.appendChild(chip);
+  });
+}
+
+buildFoodChips();
+let savedDateStr = '';
+let savedTimeStr = '';
+
+function buildChips(options, container, selectedSet) {
+  const el = document.getElementById(container);
+  options.forEach(opt => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = opt;
+    chip.onclick = () => {
+      if (selectedSet.has(opt)) {
+        selectedSet.delete(opt);
+        chip.classList.remove('selected');
+      } else {
+        selectedSet.add(opt);
+        chip.classList.add('selected');
+      }
+    };
+    el.appendChild(chip);
+  });
+}
+
+buildChips(activityOptions, 'activityChips', selectedActivities);
+
+function confirmDate() {
+  const dateVal = document.getElementById('dateInput').value;
+
+  if (!dateVal) {
+    document.getElementById('dateInput').style.borderColor = '#ff4d6d';
+    document.getElementById('dateInput').focus();
+    return;
+  }
+
+  if (!selectedTime) {
+    document.getElementById('timeError').classList.add('show');
+    return;
+  }
+
+  const dateObj = new Date(dateVal + 'T00:00:00');
+  const months = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар','7-р сар','8-р сар','9-р сар','10-р сар','11-р сар','12-р сар'];
+  savedDateStr = `${months[dateObj.getMonth()]}-ын ${dateObj.getDate()}`;
+  savedTimeStr = `, ${selectedTime} цагт`;
+
+  document.getElementById('resultBox').classList.remove('show');
+  document.querySelector('.subtitle').textContent = 'Сүүлчийн асуулт л үлдлээ 😋';
+  document.getElementById('prefsBox').classList.add('show');
+}
+
+function confirmPrefs() {
+  document.getElementById('prefsBox').classList.remove('show');
+  document.querySelector('.subtitle').style.display = 'none';
+  document.querySelector('h1').textContent = 'Саналыг минь хүлээн авсанд баярлалаа! 💖';
+  document.getElementById('confirmedText').textContent = `${savedDateStr}${savedTimeStr} уулзацгаая!`;
+
+  const foodStr = selectedFood || 'юу таарна тэрийг';
+  const actStr = selectedActivities.size ? [...selectedActivities].join(', ') : 'юу тохиолдоно тэрийг';
+  document.getElementById('prefsText').textContent = `🍽 ${foodStr} · 🎯 ${actStr}`;
+
+  document.getElementById('confirmedBox').classList.add('show');
+  spawnHearts(20);
+}
+
+const RECIPIENT_EMAIL = 'eternitysnow0210@gmail.com';
+const INVITER_NAME = 'М. Пүрэвдорж';
+
+function sendResult() {
+  const name = INVITER_NAME;
+
+  const foodStr = selectedFood || 'юу таарна тэрийг';
+  const actStr = selectedActivities.size ? [...selectedActivities].join(', ') : 'юу тохиолдоно тэрийг';
+
+  const subject = `${name}-с болзооны хариу ирлээ 💌`;
+  const body =
+`Хэн: ${name}\n` +
+`Хэзээ: ${savedDateStr}${savedTimeStr}\n` +
+`Хоол: ${foodStr}\n` +
+`Хийх зүйл: ${actStr}\n\n` +
+`— автоматаар илгээгдсэн 💕`;
+
+  const mailtoLink = `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoLink;
+
+  const note = document.getElementById('sentNote');
+  note.textContent = 'Имэйл клиент чинь нээгдсэн байх ёстой — доторх мэдээллийг шалгаад илгээгээрэй.';
+  note.classList.add('show');
+  document.getElementById('sendBtn').textContent = 'Дахин илгээх';
+}
+
+function spawnHearts(count = 8) {
+  const container = document.getElementById('heartsBg');
+  const emojis = ['💕','💗','💖','❤️','💓'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const span = document.createElement('span');
+      span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      span.style.left = Math.random() * 100 + 'vw';
+      span.style.fontSize = (16 + Math.random() * 20) + 'px';
+      span.style.animationDuration = (4 + Math.random() * 3) + 's';
+      container.appendChild(span);
+      setTimeout(() => span.remove(), 7000);
+    }, i * 150);
+  }
+}
+</script>
+
+</body>
+</html>
